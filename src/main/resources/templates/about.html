@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <h2>About Us</h2>
+
+  <div class="about-us-container">
+    <p>This is a basic minimalistic demo individual web application project named as <b>Integrated Management System</b> that serves functionalities of a management system.</p>
+
+    <p>Technologies Used so far: <b>HTML, CSS, Thymeleaf, Java</b></p>
+
+    <p><b><u>Project Timeline and Expectations:</u></b></p>
+
+    <p>The <u>first</u> phase of development starts with <b>User Management System</b>, with Role Based Access Control in place using Spring Security. Administrators can create, update and delete users. Users are able to change account credential such as password. Users can also see their reporting manager, team members and direct subordinates if any.</p>
+
+    <p>The <u>second</u> phase of development will focus on building a <b>Leave Management System</b>, where employees can apply leave with appropriate business logic, validation and approval hierarchy in place.</p>
+
+    <p>The <u>last</u> phase of development will focus on building a <b>HR management system</b>, primarily focused on resume screening so I can apply some AI/ML using Python and onboarding to link back with User Management System.</p>
+
+    <p>If time permits, I will also want to try to replace Thymeleaf with Angular as the frontend.</p>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+
+</body>
+</html>

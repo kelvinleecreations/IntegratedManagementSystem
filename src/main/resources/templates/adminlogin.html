@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Login</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <div class="login-container">
+    <h1>Administrator Login</h1>
+
+    <!-- Error banner for invalid credentials -->
+    <div class="error-global-msg" th:if="${param.error}">
+      Invalid username or password. Please retry.
+    </div>
+
+    <!-- Success banner for logging out -->
+    <div class="success-global-msg" th:if="${param.logout}">
+      You have logged out successfully.
+    </div>
+
+    <div class="login-form-section">
+      <form th:object="${login}" th:action="@{/admin/login/index}" method="POST">
+        <fieldset>
+          <label for="username">Username</label>
+          <input type="text" th:field="*{username}" required>
+        </fieldset>
+
+        <fieldset>
+          <label for="password">Password</label>
+          <input type="password" th:field="*{password}" placeholder="Enter your password" required>
+        </fieldset>
+
+        <div class="login-button">
+          <button type="submit">Log In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+
+</body>
+</html>

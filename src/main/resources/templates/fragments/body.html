@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <!-- fragment for flash attributes (not involved with Spring Security) -->
+  <div th:fragment="flash-attributes-section">
+    <div th:if="${successmsg}" th:text="${successmsg}" class="success-global-msg"></div>
+    <div th:if="${errormsg}" th:text="${errormsg}" class="error-global-msg"></div>
+  </div>
+</body>
+</html>

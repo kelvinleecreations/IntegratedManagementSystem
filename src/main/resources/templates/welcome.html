@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <h2>Welcome to Integrated Management System</h2>
+
+  <!-- Role error banner -->
+  <div class="error-global-msg" th:if="${param.adminDenied}">Access Denied: Please log in via Administrator Page</div>
+
+  <div class="error-global-msg" th:if="${param.staffDenied}">Access Denied: You are not authorised to use the Administrator Page</div>
+
+  <div class="dual-login-container">
+    <div>
+      <form th:action="@{/staff/login}" method="GET">
+        <p>Login As Staff</p>
+        <button type="submit">Proceed</button>
+        <p><i>for staff only</i></p>
+      </form>
+    </div>
+    <div>
+      <form th:action="@{/admin/login}" method="GET">
+        <p>Login As Administrator</p>
+        <button type="submit">Proceed</button>
+        <p><i>for admin only</i></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+  
+</body>
+</html>

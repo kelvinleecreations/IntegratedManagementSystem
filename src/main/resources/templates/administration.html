@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <h2>Administration</h2>
+
+  <!-- Flash Attributes -->
+  <div th:replace="~{fragments/body :: flash-attributes-section}"></div>
+
+  <h3>Users</h3>
+  <div class="add-user-section">
+    <a th:href="@{/admin/createuser}">Add User</a>
+  </div>
+
+  <div>
+    <form th:action="@{/admin/administration}" method="GET">
+      <input type="text" name="search" th:value="${filter}" placeholder="Search by Username">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <p th:if="${#lists.isEmpty(users)}">No Users Found.</p>
+  <div class="table-container">
+    <table th:unless="${#lists.isEmpty(users)}" class="user-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Administrator</th>
+          <th>Reports To</th>
+          <th>Manager</th>
+          <th>Modify</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="u : ${users}">
+          <td th:text="${u.name}"></td>
+          <td th:text="${u.username}"></td>
+          <td th:text="${u.email}"></td>
+          <td th:text="${u.role.name()=='ROLE_ADMIN'} ? 'Yes' : 'No' "></td>
+          <td th:text="${u.manager==null} ? '-' : ${u.manager.name}"></td>
+          <td th:text="${u.subordinates.size()>0} ? 'Yes' : 'No' "></td>
+          <td><a th:href="@{/admin/edituser(userId=${u.userId})}">Edit</a></td>
+          <td><form th:action="@{/admin/deleteuser(userId=${u.userId})}" method="POST"><button type="submit">X</button></form></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-section">
+    <!-- Link to Previous Page -->
+    <!-- Default page index starts at 0, 1st page is index 0 -->
+    <div class="pagination-left-section">
+      <a th:if="${currentPage>0}" th:href="@{/admin/administration(page=${currentPage-1}, search=${filter})}">Previous Page</a>
+    </div>
+
+    <!-- Current Page -->
+    <div class="pagination-middle-section">
+      <span>Page <span th:text="${currentPage+1}"></span> of <span th:text="${totalPages}"></span></span>
+    </div>
+
+    <!-- Link to Next Page -->
+    <div class="pagination-right-section">
+      <a th:if="${(currentPage+1)<totalPages}" th:href="@{/admin/administration(page=${currentPage+1}, search=${filter})}">Next Page</a>
+    </div>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+  
+</body>
+
+</html>

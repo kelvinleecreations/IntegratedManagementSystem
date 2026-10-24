@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <div class="form-header">
+    <h3>My Profile</h3>
+  </div>
+
+  <div class="form-container">
+    <!-- to resolve -->
+    <form th:action="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/saveprofile} : @{/staff/saveprofile}" th:object="${profileForm}" method="POST">
+      <!-- error summary banner -->
+      <div class="error-global-msg" th:if="${#fields.hasAnyErrors()}">
+        <p>Summary of Errors</p>
+        <ul><li th:each="error : ${#fields.allErrors()}" th:text=${error}></li></ul>
+        <p> Unable to update your details. Please re-enter fields or review again before saving. </p>
+      </div>
+
+      <input type="hidden" th:field="*{userId}">
+      <div class="form-fields-section">
+        <!-- user info -->
+        <h3>User Personal Details</h3>
+        <fieldset>
+          <label>Name:</label>
+          <input type="text" th:field="*{name}" readonly>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Username:</label>
+          <input type="text" th:field="*{username}" readonly>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Email:</label>
+          <input type="text" th:field="*{email}" readonly>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </fieldset>
+
+        <h3>Change Password</h3>
+
+        <fieldset>
+          <label>Current Password:</label>
+          <input type="password" th:field="*{currentPassword}">
+          <span class="error-field-msg" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>New Password:</label>
+          <input type="password" th:field="*{newPassword}">
+          <span class="error-field-msg" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></span>
+        </fieldset>
+    
+        <div class="form-buttons">
+          <button type="submit">Save Changes</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+  
+</body>
+</html>

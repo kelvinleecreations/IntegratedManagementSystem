@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Form</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <div class="form-header">
+    <h3>User Form</h3>
+  </div>
+
+  <div class="form-container">
+    <form th:action="@{/admin/createuser}" th:object="${userForm}" method="POST">
+      <!-- error summary banner -->
+       <div class="error-global-msg" th:if="${#fields.hasAnyErrors()}">
+        <p>Summary of Errors</p>
+        <ul><li th:each="error : ${#fields.allErrors()}" th:text=${error}></li></ul>
+        <p> Unable to create new user. Please re-enter fields or review again before creating. </p>
+       </div>
+  
+       <input type="hidden" th:field="*{userId}">
+       <div class="form-fields-section">
+        <!-- user info -->
+        <h3>User Personal Details</h3>
+        <fieldset>
+          <label>Name:</label>
+          <input type="text" th:field="*{name}">
+          <span class="error-field-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Username:</label>
+          <input type="text" th:field="*{username}">
+          <span class="error-field-msg" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+        </fieldset>
+
+         <fieldset>
+          <label>Email:</label>
+          <input type="text" th:field="*{email}">
+          <span class="error-field-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Role:</label>
+          <select th:field="*{role}">
+            <option value="">--Select Role--</option>
+            <option value="ROLE_ADMIN">Admin</option>
+            <option value="ROLE_CEO">CEO</option>
+            <option value="ROLE_HR_RECRUITER">HR Recruiter</option>
+            <option value="ROLE_HR_INTERNAL">HR Internal</option>
+            <option value="ROLE_HR_MANAGER">HR Manager</option>
+            <option value="ROLE_EMPLOYEE">Employee</option>
+          </select>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Reports To:</label>
+          <select th:field="*{manager}">
+            <option value="">--Select Manager--</option>
+            <option th:each="mngr : ${managers}" th:unless="${mngr.userId==userForm.userId}" th:value="${mngr.userId}" th:text="${mngr.name}"></option>
+          </select>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('manager')}" th:errors="*{manager}"></span>
+        </fieldset>
+
+        <div class="form-buttons">
+          <button type="submit">Save User</button>
+          <button type="reset">Reset</button>
+        </div>
+       </div>
+    </form>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+  
+</body>
+</html>

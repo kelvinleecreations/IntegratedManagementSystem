@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Team</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <h2>Cross-Functional Team</h2>
+
+  <h3>Your Reporting Manager:</h3>
+  <p th:if="${manager == null}">You do not have a reporting manager.</p>
+
+  <div class="my-team-container" th:unless="${manager == null}">
+    <div class="manager-user-profile-card">
+      <div class="user-profile-card-title">
+        <h3 th:text="${manager.name}"></h3>
+        <span th:text="${manager.role.roleLabel}"></span>
+      </div>
+      <div class="user-profile-card-description">
+        <p>Email: <span th:text="${manager.email}"></span></p>
+      </div>
+    </div>
+  </div>
+
+  <div th:unless="${manager == null}">
+    <h3>Other Members reporting to this Manager:</h3>
+    <p th:if="${#lists.isEmpty(otherMembers)}">You are the only person reporting to this manager.</p>
+
+    <div class="my-team-container" th:unless="${#lists.isEmpty(otherMembers)}">
+      <div class="user-profile-card" th:each="m : ${otherMembers}">
+        <div class="user-profile-card-title">
+          <h3 th:text="${m.name}"></h3>
+          <span th:text="${m.role.roleLabel}"></span>
+        </div>
+        <div class="user-profile-card-description">
+          <p>Email: <span th:text="${m.email}"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Directing Team</h2>
+  <h3>Your Subordinates:</h3>
+  <p th:if="${#lists.isEmpty(subordinates)}">You do not have subordinates reporting to you.</p>
+
+  <div class="my-team-container" th:unless="${#lists.isEmpty(subordinates)}">
+    <div class="user-profile-card" th:each="s : ${subordinates}">
+      <div class="user-profile-card-title">
+        <h3 th:text="${s.name}"></h3>
+        <span th:text="${s.role.roleLabel}"></span>
+      </div>
+      <div class="user-profile-card-description">
+        <p>Email: <span th:text="${s.email}"></span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <!-- fragment for header across all pages -->
+  <header th:fragment="header-section">
+    <div class="header-logo-icon">
+      <strong>Integrated Management System</strong>
+    </div>
+
+    <nav class="header-nav-icon">
+      <!-- Welcome Page Header, with no user logged in -->
+      <th:block sec:authorize="isAnonymous()">
+        <a th:href="@{/about}">About Us</a>
+      </th:block>
+
+       <!-- My Team Function, for every user logged in, except admin -->
+      <th:block sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+        <a th:href="@{/staff/myteam}">My Team</a>
+      </th:block>
+
+      <!-- For Admin User Logged In -->
+      <th:block sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/administration}">Administration</a>
+      </th:block>
+
+      <!-- For HR User Logged In -->
+      <th:block sec:authorize="hasAnyRole('HR_DIRECTOR', 'HR_MANAGER_R', 'HR_MANAGER_I', 'HR_RECRUITER', 'HR_INTERNAL')">
+        <a th:href="@{/staff/hr}">HR</a>
+      </th:block>
+
+      <!-- For Finance User Logged In -->
+      <th:block sec:authorize="hasAnyRole('FINANCE_DIRECTOR', 'FINANCE_MANAGER', 'FINANCE_EMPLOYEE')">
+        <a th:href="@{/staff/finance}">Finance</a>
+      </th:block>
+
+      <!-- Profile Function, for every user logged in -->
+      <th:block sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/profile}">My Profile</a>
+      </th:block>
+
+      <th:block sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+        <a th:href="@{/staff/profile}">My Profile</a>
+      </th:block>
+
+      <!-- Logout Function, for every user logged in -->
+      <th:block sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="POST">
+          <button type="submit">Logout</button>
+        </form>
+      </th:block>
+    </nav>
+  </header>
+
+  <!-- fragment for greeting user when logged in -->
+  <div th:fragment="welcome-user-section">
+     <!-- Thymeleaf Spring Security Dialect Engine bypasses the controller, checks the logged-in principal (SecurityUserDetails object) and calls getUsername(). This is essentially the same object injected in controller via AuthenticationPrincipal. -->
+    <p>Welcome <span sec:authentication="name">Guest</span>.</p>
+  </div>
+
+</body>
+</html>
