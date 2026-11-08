@@ -19,6 +19,9 @@
 
   <div class="error-global-msg" th:if="${param.staffDenied}">Access Denied: You are not authorised to use the Administrator Page</div>
 
+  <!-- Flash Attributes -->
+  <div th:replace="~{fragments/body :: flash-attributes-section}"></div>
+
   <div class="dual-login-container">
     <div>
       <form th:action="@{/staff/login}" method="GET">

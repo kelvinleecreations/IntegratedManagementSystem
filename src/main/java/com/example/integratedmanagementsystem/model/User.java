@@ -1,7 +1,10 @@
 package com.example.integratedmanagementsystem.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +19,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
 
@@ -50,16 +54,53 @@ public class User {
   @ManyToOne
   private User manager;
 
+  @PositiveOrZero(message="Days cannot be negative")
+  private Double actualAnnualLeaveDays;
+  @PositiveOrZero(message="Days cannot be negative")
+  private Double budgetedAnnualLeaveDays;
+
+  @PositiveOrZero(message="Days cannot be negative")
+  private Double actualHospitalizationLeaveDays;
+  @PositiveOrZero(message="Days cannot be negative")
+  private Double budgetedHospitalizationLeaveDays;
+
+  @Enumerated(EnumType.STRING)
+  private MaritalStatus maritalStatus;
+
+  @Column(nullable=true)
+  private Integer childrenCount;
+
+  @PositiveOrZero(message="Days cannot be negative")
+  private Double actualChildcareLeaveDays;
+  @PositiveOrZero(message="Days cannot be negative")
+  private Double budgetedChildcareLeaveDays;
+
+  @DateTimeFormat(pattern="yyyy-MM-dd")
+  private LocalDate dateOfJoin;
+
+  // One user can make 0 to many applications (Inverse side)
+  @OneToMany(mappedBy="user", fetch=FetchType.LAZY)
+  private List<Application> applications;
+
   public User() {
   }
 
-  public User(String name, String username, String email, String password, Role role, User manager) {
+  public User(String name, String username, String email, String password, Role role, User manager, Double actualAnnualLeaveDays, Double budgetedAnnualLeaveDays, Double actualHospitalizationLeaveDays, Double budgetedHospitalizationLeaveDays, MaritalStatus maritalStatus, Integer childrenCount, Double actualChildcareLeaveDays, Double budgetedChildcareLeaveDays, LocalDate dateOfJoin) {
     this.name = name;
     this.username = username;
     this.email = email;
     this.password = password;
     this.role = role;
     this.manager = manager;
+    this.actualAnnualLeaveDays = actualAnnualLeaveDays;
+    this.budgetedAnnualLeaveDays = budgetedAnnualLeaveDays;
+    this.actualHospitalizationLeaveDays = actualHospitalizationLeaveDays;
+    this.budgetedHospitalizationLeaveDays = budgetedHospitalizationLeaveDays;
+    this.maritalStatus = maritalStatus;
+    this.childrenCount = childrenCount;
+    this.actualChildcareLeaveDays = actualChildcareLeaveDays;
+    this.budgetedChildcareLeaveDays = budgetedChildcareLeaveDays;
+    this.dateOfJoin = dateOfJoin;
   }
 
   public Integer getUserId() {
@@ -126,6 +167,78 @@ public class User {
     this.manager = manager;
   }
 
+  public Double getActualAnnualLeaveDays() {
+    return actualAnnualLeaveDays;
+  }
+
+  public void setActualAnnualLeaveDays(Double actualAnnualLeaveDays) {
+    this.actualAnnualLeaveDays = actualAnnualLeaveDays;
+  }
+
+  public Double getBudgetedAnnualLeaveDays() {
+    return budgetedAnnualLeaveDays;
+  }
+
+  public void setBudgetedAnnualLeaveDays(Double budgetedAnnualLeaveDays) {
+    this.budgetedAnnualLeaveDays = budgetedAnnualLeaveDays;
+  }
+
+  public Double getActualHospitalizationLeaveDays() {
+    return actualHospitalizationLeaveDays;
+  }
+
+  public void setActualHospitalizationLeaveDays(Double actualHospitalizationLeaveDays) {
+    this.actualHospitalizationLeaveDays = actualHospitalizationLeaveDays;
+  }
+
+  public Double getBudgetedHospitalizationLeaveDays() {
+    return budgetedHospitalizationLeaveDays;
+  }
+
+  public void setBudgetedHospitalizationLeaveDays(Double budgetedHospitalizationLeaveDays) {
+    this.budgetedHospitalizationLeaveDays = budgetedHospitalizationLeaveDays;
+  }
+
+  public MaritalStatus getMaritalStatus() {
+    return maritalStatus;
+  }
+
+  public void setMaritalStatus(MaritalStatus maritalStatus) {
+    this.maritalStatus = maritalStatus;
+  }
+
+  public Integer getChildrenCount() {
+    return childrenCount;
+  }
+
+  public void setChildrenCount(Integer childrenCount) {
+    this.childrenCount = childrenCount;
+  }
+
+  public Double getActualChildcareLeaveDays() {
+    return actualChildcareLeaveDays;
+  }
+
+  public void setActualChildcareLeaveDays(Double actualChildcareLeaveDays) {
+    this.actualChildcareLeaveDays = actualChildcareLeaveDays;
+  }
+
+  public Double getBudgetedChildcareLeaveDays() {
+    return budgetedChildcareLeaveDays;
+  }
+
+  public void setBudgetedChildcareLeaveDays(Double budgetedChildcareLeaveDays) {
+    this.budgetedChildcareLeaveDays = budgetedChildcareLeaveDays;
+  }
+
+  public LocalDate getDateOfJoin() {
+    return dateOfJoin;
+  }
+
+  public void setDateOfJoin(LocalDate dateOfJoin) {
+    this.dateOfJoin = dateOfJoin;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -149,5 +262,13 @@ public class User {
     } else if (!userId.equals(other.userId))
       return false;
     return true;
+  }
+
+  public List<Application> getApplications() {
+    return applications;
+  }
+
+  public void setApplications(List<Application> applications) {
+    this.applications = applications;
   }  
 }

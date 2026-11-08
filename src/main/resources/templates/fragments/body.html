@@ -7,5 +7,36 @@
     <div th:if="${successmsg}" th:text="${successmsg}" class="success-global-msg"></div>
     <div th:if="${errormsg}" th:text="${errormsg}" class="error-global-msg"></div>
   </div>
+
+  <!-- fragment for filter (index) -->
+  <div th:fragment="filter-section-index">
+    <!-- filter year section -->
+    <h3>Filter By Year</h3>
+
+    <form th:action="@{/staff/index}" method="GET">
+      <label>Select Year:</label>
+      <select name="yearSearch">
+        <option th:each="y: ${yearSelection}" th:value="${y}" th:text="${y}" th:selected="${y == leave.selectedYear}"></option>
+      </select>
+
+      <button type="submit">Enter</button>
+    </form>
+  </div>
+
+  <!-- fragment for filter (reviewedleave) -->
+  <div th:fragment="filter-section-reviewedleave">
+    <!-- filter year section -->
+    <h3>Filter By Year</h3>
+
+    <form th:action="@{/staff/reviewedleave}" method="GET">
+      <label>Select Year:</label>
+      <select name="yearSearch">
+        <option th:each="y: ${yearSelection}" th:value="${y}" th:text="${y}" th:selected="${y == selectedYear}"></option>
+      </select>
+
+      <button type="submit">Enter</button>
+    </form>
+  </div>
+
 </body>
 </html>

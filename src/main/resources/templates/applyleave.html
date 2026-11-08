@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply Leave</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <div class="form-header">
+    <h3>Apply Leave Form</h3>
+  </div>
+
+  <!-- only show when the leave has been reviewed -->
+  <div th:object="${leaveApplicationForm}">
+    <div th:if="*{applicationStatus != null && (applicationStatus.name()=='APPROVED' || applicationStatus.name()=='REJECTED' || applicationStatus.name()=='CANCELLED' || applicationStatus.name()=='LOCKED')}" class="manager-justification-section">
+      <h3>Manager's Reason for Approval / Rejection:</h3>
+      <p th:text="*{managerReason}"></p>
+    </div>
+  </div> 
+
+  <div class="form-container" th:object="${leaveApplicationForm}">
+    <form th:action="@{/staff/applyleave}" method="POST">
+      <!-- error summary banner -->
+      <div class="error-global-msg" th:if="${#fields.hasAnyErrors()}">
+        <p th:if="${svcvalidationerror}" th:text="${svcvalidationerror}"></p>
+        <p>Summary of Errors</p>
+          <ul><li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li></ul>
+          <p> Unable to submit a leave application. Please re-enter fields or review again before submitting. </p>
+      </div>
+
+      <input type="hidden" th:field="*{applicationId}">
+      <input type="hidden" th:field="*{applicationStatus}">
+      <input type="hidden" th:field="*{user.userId}">
+      <div class="form-fields-section">
+        <!-- user info -->
+        <h3>User Personal Details</h3>
+        <fieldset>
+          <label>Name:</label>
+          <input type="text" th:field="*{user.name}">
+        </fieldset>
+
+        <fieldset>
+          <label>Email:</label>
+          <input type="text" th:field="*{user.email}">
+        </fieldset>
+
+        <!-- leave details -->
+        <h3>Leave Application Details</h3>
+        <fieldset>
+          <label>Leave Type:</label>
+          <select th:field="*{leaveType}">
+            <option value="">--Leave Type--</option>
+            <option value="ANNUAL">Annual</option>
+            <option value="HOSPITALISATION">Hospitalisation</option>
+            <option value="CHILDCARE">Child Care</option>
+          </select>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('leaveType')}" th:errors="*{leaveType}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Leave Duration:</label>
+          <select th:field="*{leaveDuration}">
+            <option value="">--Leave Duration--</option>
+            <option value="HALFDAYAM">Half Day (AM)</option>
+            <option value="HALFDAYPM">Half Day (PM)</option>
+            <option value="FULLDAY">Full Day</option>
+          </select>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('leaveDuration')}" th:errors="*{leaveDuration}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Leave Start Date:</label>
+          <input type="date" th:field="*{startDate}">
+          <span class="error-field-msg" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Leave End Date:</label>
+          <input type="date" th:field="*{endDate}">
+          <span class="error-field-msg" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></span>
+        </fieldset>
+
+        <div class="form-justification">
+          <fieldset>
+            <label>Reason for Leave Application:</label>
+            <textarea th:field="*{userReason}" rows="5" placeholder="Please provide your reason within 1000 characters"></textarea>
+            <span class="error-field-msg" th:if="${#fields.hasErrors('userReason')}" th:errors="*{userReason}"></span>
+          </fieldset>
+        </div>
+
+         <div class="form-justification" th:if="*{applicationStatus != null && (applicationStatus.name()=='APPROVED' || applicationStatus.name()=='CANCELLED')}">
+          <fieldset>
+            <label>Reason for Leave Cancellation:</label>
+            <textarea th:field="*{userCancellationReason}" rows="5" placeholder="Please provide your cancellation reason within 1000 characters"></textarea>
+            <span class="error-field-msg" th:if="${#fields.hasErrors('userCancellationReason')}" th:errors="*{userCancellationReason}"></span>
+          </fieldset>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit">Save</button>
+          <button type="reset">Reset</button>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" th:formaction="@{/staff/deleteleave}" th:if="*{applicationStatus != null && (applicationStatus.name()=='APPLIED' || applicationStatus.name()=='UPDATED')}">Delete Application</button>
+          <button type="submit" th:formaction="@{/staff/cancelleave}" th:if="*{applicationStatus != null && (applicationStatus.name()=='APPROVED' || applicationStatus.name()=='CANCELLED')}">Cancel Approved Application</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+
+</body>
+</html>

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.example.integratedmanagementsystem.model.MaritalStatus;
 import com.example.integratedmanagementsystem.model.Role;
 import com.example.integratedmanagementsystem.model.User;
 import com.example.integratedmanagementsystem.repository.UserRepository;
@@ -40,21 +41,21 @@ public class UserRepositoryTests {
 	@BeforeEach 
 	void setUpData() {
 
-		u1 = new User("John", "johnny", "john@email.com", "DefaultPassword", Role.ROLE_CEO, null);
-		u2 = new User("Sarah", "sera", "sarah@email.com", "DefaultPassword", Role.ROLE_HR_DIRECTOR, u1);
-		u3 = new User("Christina", "chrissy", "christina@email.com", "DefaultPassword", Role.ROLE_FINANCE_DIRECTOR, u1);
-		u4 = new User("Natalie", "nat", "natalie@email.com", "DefaultPassword", Role.ROLE_HR_MANAGER_I, u2);
-		u5 = new User("Natty", "natty", "natty@email.com", "DefaultPassword", Role.ROLE_HR_MANAGER_R, u2);
-		u6 = new User("Tim", "timmy", "tim@email.com", "DefaultPassword", Role.ROLE_ADMIN, null);
-		u7 = new User("Vela", "vela", "vela@email.com", "DefaultPassword", Role.ROLE_HR_INTERNAL, u4);
-		u8 = new User("Florence", "florence", "florence@email.com", "DefaultPassword", Role.ROLE_HR_RECRUITER, u5);
-		u9 = new User("Nico", "nico", "nico@email.com", "DefaultPassword", Role.ROLE_HR_INTERNAL, u4);
-		u10 = new User("Eva", "eva", "eva@email.com", "DefaultPassword", Role.ROLE_HR_RECRUITER, u5);
-		u11 = new User("Lina", "lina", "lina@email.com", "DefaultPassword", Role.ROLE_FINANCE_MANAGER, u3);
-		u12 = new User("Evangeline", "evangeline", "evangeline@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11);
-		u13 = new User("Angel", "angel", "angel@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11);
-		u14 = new User ("Eugene", "eugene", "eugene@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11);
-		u15 = new User ("Eleanor", "eleanor", "eleanor@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11);
+		u1 = new User("John", "johnny", "john@email.com", "DefaultPassword", Role.ROLE_CEO, null, null, null, null, null, null, null, null, null, null);
+		u2 = new User("Sarah", "sera", "sarah@email.com", "DefaultPassword", Role.ROLE_HR_DIRECTOR, u1, 14.0, 14.0, 60.0, 60.0, MaritalStatus.MARRIED, 3, 12.0, 12.0, null);
+		u3 = new User("Christina", "chrissy", "christina@email.com", "DefaultPassword", Role.ROLE_FINANCE_DIRECTOR, u1, 14.0, 14.0, 60.0, 60.0, MaritalStatus.MARRIED, 2, 10.0, 10.0, null);
+		u4 = new User("Natalie", "nat", "natalie@email.com", "DefaultPassword", Role.ROLE_HR_MANAGER_I, u2, 12.0, 12.0, 60.0, 60.0, MaritalStatus.MARRIED, 1, 8.0, 8.0, null);
+		u5 = new User("Natty", "natty", "natty@email.com", "DefaultPassword", Role.ROLE_HR_MANAGER_R, u2, 12.0, 12.0, 60.0, 60.0, MaritalStatus.MARRIED, 1, 8.0, 8.0, null);
+		u6 = new User("Tim", "timmy", "tim@email.com", "DefaultPassword", Role.ROLE_ADMIN, null, null, null, null, null, null, null, null, null, null);
+		u7 = new User("Vela", "vela", "vela@email.com", "DefaultPassword", Role.ROLE_HR_INTERNAL, u4, 10.0, 10.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
+		u8 = new User("Florence", "florence", "florence@email.com", "DefaultPassword", Role.ROLE_HR_RECRUITER, u5, 9.0, 9.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
+		u9 = new User("Nico", "nico", "nico@email.com", "DefaultPassword", Role.ROLE_HR_INTERNAL, u4, 10.0, 10.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
+		u10 = new User("Eva", "eva", "eva@email.com", "DefaultPassword", Role.ROLE_HR_RECRUITER, u5, 9.0, 9.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
+		u11 = new User("Lina", "lina", "lina@email.com", "DefaultPassword", Role.ROLE_FINANCE_MANAGER, u3, 12.0, 12.0, 60.0, 60.0, MaritalStatus.MARRIED, 2, 10.0, 10.0, null);
+		u12 = new User("Evangeline", "evangeline", "evangeline@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11, 8.0, 8.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
+		u13 = new User("Angel", "angel", "angel@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11, 8.0, 8.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
+		u14 = new User ("Eugene", "eugene", "eugene@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11, 9.0, 9.0, 60.0, 60.0, MaritalStatus.MARRIED, 0, 0.0, 0.0, null);
+		u15 = new User ("Eleanor", "eleanor", "eleanor@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11, 10.0, 10.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
 
 		entityManager.persist(u1);
 		entityManager.persist(u2);
@@ -99,7 +100,7 @@ public class UserRepositoryTests {
 		@Test
 		@DisplayName("Create User Successfully")
 		void testCreateUser() {
-			User newUser = new User("Bryce", "bryce", "bryce@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11);
+			User newUser = new User("Bryce", "bryce", "bryce@email.com", "DefaultPassword", Role.ROLE_FINANCE_EMPLOYEE, u11, 8.0, 8.0, 60.0, 60.0, MaritalStatus.SINGLE, 0, 0.0, 0.0, null);
 
 			User savedUser = userRepository.save(newUser);
 
@@ -299,7 +300,8 @@ public class UserRepositoryTests {
 			Pageable pageable1 = PageRequest.of(0,5);
 			Pageable pageable2 = PageRequest.of(1,5);
 
-			// Scenario 1, 2, 3: No blank spaces and capitalisation. Expecting 3 rows, 1 page
+			// Scenario 1 - 4: No blank spaces and capitalisation.
+			// Scenario 1 & 2: Expecting 3 rows, 1 page
 			String filter1 = "V";
 			String filter2 = "v";
 
@@ -324,7 +326,7 @@ public class UserRepositoryTests {
 			assertThat(filterPage3.getTotalElements()).isEqualTo(0);
 			assertThat(filterPage3.getTotalPages()).isEqualTo(0);
 
-			// Scenario 5: Expecting more results till 2 pages
+			// Scenario 4: Expecting more results till 2 pages
 			String filter4 = "E";
 			Page<User> filterPage4 = userRepository.findByUsernameContainingIgnoreCase(filter4, pageable1);
 			Page<User> filterPage5 = userRepository.findByUsernameContainingIgnoreCase(filter4, pageable2);
@@ -382,7 +384,7 @@ public class UserRepositoryTests {
 		}
 	}
 
-	@AfterEach 
+	@AfterEach
 	void tearDownData() {
 		u1 = u2 = u3 = u4 = u5 = u6 = u7 = u8 = u9 = u10 = u11 = u12 = u13 = u14 = u15 = null;
 	}

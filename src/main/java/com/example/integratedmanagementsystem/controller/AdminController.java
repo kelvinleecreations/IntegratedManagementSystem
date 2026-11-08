@@ -1,5 +1,6 @@
 package com.example.integratedmanagementsystem.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,10 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.integratedmanagementsystem.exception.SvcValidationException;
+import com.example.integratedmanagementsystem.model.LeaveDTO;
 import com.example.integratedmanagementsystem.model.ProfileDTO;
 import com.example.integratedmanagementsystem.model.User;
 import com.example.integratedmanagementsystem.repository.UserRepository;
 import com.example.integratedmanagementsystem.security.SecurityUserDetails;
+import com.example.integratedmanagementsystem.service.LeaveApplicationService;
+import com.example.integratedmanagementsystem.service.UserService;
 
 import jakarta.validation.Valid;
 
@@ -32,22 +36,57 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class AdminController {
 
   private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
+  private final UserService userService;
+  private final LeaveApplicationService leaveApplicationService;
 
-  public AdminController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+  public AdminController(UserRepository userRepository, UserService userService, LeaveApplicationService leaveApplicationService) {
     this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
+    this.userService = userService;
+    this.leaveApplicationService = leaveApplicationService;
   }
 
   @GetMapping("/index")
-  public String showAdminIndex() {
+  public String showAdminIndex(@AuthenticationPrincipal SecurityUserDetails principalUser, @RequestParam(required=false) Integer yearSearch, Model model, RedirectAttributes ra) {
+
+  // additional check whether user exists
+  User loggedInUser = principalUser.getUser();
+  
+  // get from database
+  User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
+
+  if (currentUser == null) {
+    return "redirect:/logout/accountnotfound";
+  }
+
+  try {
+    model.addAttribute("user", loggedInUser);
+
+    // add in the leave dto to show dynamic changes based on year selection to user-statistics
+    Integer selectedYear = (yearSearch != null) ? yearSearch : LocalDate.now().getYear();
+    LeaveDTO leaveDTO = leaveApplicationService.getLeaveFiguresBasedOnSelectedYear(loggedInUser.getUserId(), selectedYear);
+
+    model.addAttribute("leave", leaveDTO);
+    model.addAttribute("yearSelection", List.of(2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029));
     return "index";
+
+  } catch (RuntimeException error) {
+    ra.addFlashAttribute("errormsg", error.getMessage());
+    return "redirect:/admin/index";
+    }
   }
 
   @GetMapping("/profile")
-  public String showAdminProfile(@AuthenticationPrincipal SecurityUserDetails principalUser, Model model) {
+  public String showAdminProfile(@AuthenticationPrincipal SecurityUserDetails principalUser, Model model, RedirectAttributes ra) {
 
+    // additional check whether user exists
     User loggedInUser = principalUser.getUser();
+  
+    // get from database
+    User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
+
+    if (currentUser == null) {
+      return "redirect:/logout/accountnotfound";
+    }
 
     ProfileDTO form = new ProfileDTO();
 
@@ -58,62 +97,62 @@ public class AdminController {
   }
 
   @PostMapping("/saveprofile")
-  public String saveStaffProfile(@AuthenticationPrincipal SecurityUserDetails principalUser, @Valid @ModelAttribute("profileForm") ProfileDTO form, BindingResult result, RedirectAttributes ra) {
+  public String saveAdminProfile(@AuthenticationPrincipal SecurityUserDetails principalUser, @Valid @ModelAttribute("profileForm") ProfileDTO form, BindingResult result, Model model, RedirectAttributes ra) {
 
+    // additional check whether user exists
     User loggedInUser = principalUser.getUser();
+  
+    // get from database
+    User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
 
-    boolean hasCurrentPassword = form.getCurrentPassword() != null && !form.getCurrentPassword().trim().isEmpty();
-    boolean hasNewPassword = form.getNewPassword() != null && !form.getNewPassword().trim().isEmpty();
-    
-    // When both fields are not filled
-    if (!hasCurrentPassword && !hasNewPassword) {
-      ra.addFlashAttribute("errormsg", "No changes saved. You are redirected back to your home page.");
-      return "redirect:/admin/index";
+    if (currentUser == null) {
+      return "redirect:/logout/accountnotfound";
     }
 
-    // Apply NotBlank Validation only when either field is filled
-    if (hasCurrentPassword || hasNewPassword) {
-      // If current password field is not filled while new password is filled,
-      if (!hasCurrentPassword) {
-        result.rejectValue("currentPassword", "currentPasswordEmptyError", "Please enter your current password");
-      }
-
-      // If current password field is filled while new password is not filled,
-      if (!hasNewPassword) {
-        result.rejectValue("newPassword", "newPasswordEmptyError", "Please enter your new password");
-      }
-
-      // If current password is filled and it does not match with the existing password from the database,
-      if (hasCurrentPassword && !passwordEncoder.matches(form.getCurrentPassword(), loggedInUser.getPassword())) {
-        result.rejectValue("currentPassword", "currentPasswordMatchingError", "The current password entered does not match with your existing one");
-      }
-
-      // If password is filled but does not fulfil the password change constraints,
-      if (hasNewPassword && (form.getNewPassword().trim().length() < 5 || form.getNewPassword().trim().length() > 20)) {
-        result.rejectValue("newPassword", "newPasswordLengthError", "New Password should only be between 5 to 20 characters, inclusive");
-      } 
-    }
-
+    // valid annotation check
     if (result.hasErrors()) {
       return "profile";
     }
 
-    // Update Password
-    // Encrypt password for Spring Security during login
-    if (hasNewPassword){
-      String encryptedPassword = passwordEncoder.encode(form.getNewPassword());
-      loggedInUser.setPassword(encryptedPassword);
-    }
-    
-    userRepository.save(loggedInUser);
+    // try-catch block with Service Layer
+    try {
+      String status = userService.saveUserProfile(form, loggedInUser);
 
-    // Flash Attribute
-    ra.addFlashAttribute("successmsg", "Password updated successfully!");
-    return "redirect:/admin/index";
+      if ("NO_CHANGES".equals(status)) {
+        ra.addFlashAttribute("errormsg", "No changes saved. You are redirected back to your home page.");
+      }
+
+      if ("UPDATED".equals(status)) {
+        ra.addFlashAttribute("successmsg", "Password updated successfully!");
+      }
+
+      return "redirect:/admin/index";
+
+    } catch (SvcValidationException e) {
+      // display individual field error messages beside the respective fields
+      e.getErrors().forEach((fieldName, message) -> {
+        result.rejectValue(fieldName, e.getErrorCode(), message);
+      });
+
+      // differentiate between valid annotation check and service check
+      model.addAttribute("svcvalidationerror", e.getMessage());
+      
+      return "profile";
+    } 
   }
 
   @GetMapping("/administration")
-  public String showAdministration(@RequestParam(defaultValue = "0") int page, @RequestParam(required=false) String search, Model model) {
+  public String showAdministration(@AuthenticationPrincipal SecurityUserDetails principalUser, @RequestParam(defaultValue = "0") int page, @RequestParam(required=false) String search, Model model, RedirectAttributes ra) {
+
+    // additional check whether user exists
+    User loggedInUser = principalUser.getUser();
+  
+    // get from database
+    User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
+
+    if (currentUser == null) {
+      return "redirect:/logout/accountnotfound";
+    }
 
     Pageable pageable = PageRequest.of(page,10, Sort.by("userId").ascending());
 
@@ -141,7 +180,18 @@ public class AdminController {
   }
 
   @GetMapping("/createuser")
-  public String createUser(Model model){
+  public String createUser(@AuthenticationPrincipal SecurityUserDetails principalUser, Model model, RedirectAttributes ra){
+
+    // additional check whether user exists
+    User loggedInUser = principalUser.getUser();
+  
+    // get from database
+    User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
+
+    if (currentUser == null) {
+      return "redirect:/logout/accountnotfound";
+    }
+
     User form = new User();
 
     model.addAttribute("userForm", form);
@@ -154,28 +204,19 @@ public class AdminController {
   }
 
   @PostMapping("/createuser")
-  public String saveUser(@Valid @ModelAttribute("userForm") User form, BindingResult result, Model model, RedirectAttributes ra) {
+  public String saveUser(@AuthenticationPrincipal SecurityUserDetails principalUser, @Valid @ModelAttribute("userForm") User form, BindingResult result, Model model, RedirectAttributes ra) {
 
-    // during registration of new users,
-    if (form.getUserId() == null) {
-      // check if the username already exists
-      if (userRepository.existsByUsername(form.getUsername())){
-        result.rejectValue("username", "usernameerror", "Username already exists");
-      }
+    // additional check whether user exists
+    User loggedInUser = principalUser.getUser();
+  
+    // get from database
+    User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
+
+    if (currentUser == null) {
+      return "redirect:/logout/accountnotfound";
     }
 
-    // during editing of existing users
-    else {
-      // 'Not' is to exclude ownself from the check of duplicate username, allowing editing and updating to pass through
-
-      // Example when the admin is trying to edit Cass's details, it will pass even though the username already exist, just because it is hers to begin with
-
-      // If the username is found to exist within a user's details when editing another user details, reject
-      if (userRepository.existsByUsernameAndUserIdNot(form.getUsername(), form.getUserId())){
-        result.rejectValue("username", "usernameerror", "Username already exists");
-      }
-    }
-
+    // valid annotation check
     if (result.hasErrors()) {
       // repopulate the manager list
       List<User> managers = userRepository.findAllManagers();
@@ -183,38 +224,52 @@ public class AdminController {
       return "userform";
     }
 
-    // check if it is a new user or an existing user
-    boolean isNewUser = (form.getUserId()==null);
+    // try-catch block with Service Layer
+    try {
+      String status = userService.saveUser(form);
 
-    // for existing user, extract original pw
-    if (!isNewUser) {
-      User originalUserDetails = userRepository.findById(form.getUserId()).orElse(null);
-      form.setPassword(originalUserDetails.getPassword());
+      if ("NO_CHANGES".equals(status)) {
+        ra.addFlashAttribute("errormsg", "No changes saved. You are redirected back to the administration page.");
+      }
+
+      if ("CREATED".equals(status)) {
+        ra.addFlashAttribute("successmsg", "User '" + form.getUserId() + "' created successfully!");
+      }
+
+      if ("UPDATED".equals(status)) {
+        ra.addFlashAttribute("successmsg", "User '" + form.getUserId() + "' updated successfully!");
+      }
+      
+      return "redirect:/admin/administration";
+
+    } catch (SvcValidationException e) {
+      // display individual field error messages beside the respective fields
+      e.getErrors().forEach((fieldName, message) -> {
+        result.rejectValue(fieldName, e.getErrorCode(), message);
+      });
+
+      List<User> managers = userRepository.findAllManagers();
+      model.addAttribute("managers", managers);
+
+      // differentiate between valid annotation check and service check
+      model.addAttribute("svcvalidationerror", e.getMessage());
+      return "userform";
     }
-    // for new users, give them default pw to login
-    else {
-      form.setPassword("DefaultPassword");
-
-      // Encrypt password for Spring Security during login
-      String encryptedPassword = passwordEncoder.encode(form.getPassword());
-      form.setPassword(encryptedPassword);
-    }
-
-    userRepository.save(form);
-
-    // Flash Attributes
-    if (isNewUser) {
-      ra.addFlashAttribute("successmsg", "User '" + form.getUserId() + "' created successfully!");
-    } else {
-      ra.addFlashAttribute("successmsg", "User '" + form.getUserId() + "' updated successfully!");
-    }
-
-    return "redirect:/admin/administration";
-
   }
 
   @GetMapping("/edituser")
-  public String editUser(@RequestParam(name="userId", required=true) Integer id, Model model, RedirectAttributes ra) {
+  public String editUser(@AuthenticationPrincipal SecurityUserDetails principalUser, @RequestParam(name="userId", required=true) Integer id, Model model, RedirectAttributes ra) {
+
+    // additional check whether user exists
+    User loggedInUser = principalUser.getUser();
+  
+    // get from database
+    User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
+
+    if (currentUser == null) {
+      return "redirect:/logout/accountnotfound";
+    }
+    
     // check if the user to be edited exists
     User editedUser = userRepository.findById(id).orElse(null);
     if (editedUser == null) {
@@ -240,7 +295,16 @@ public class AdminController {
   @PostMapping("/deleteuser")
   public String deleteUser(@AuthenticationPrincipal SecurityUserDetails principalUser, @RequestParam(name="userId", required=true) Integer id, Model model, RedirectAttributes ra) {
 
+    // additional check whether user exists
     User loggedInUser = principalUser.getUser();
+  
+    // get from database
+    User currentUser = userRepository.findById(loggedInUser.getUserId()).orElse(null);
+
+    if (currentUser == null) {
+      return "redirect:/logout/accountnotfound";
+    }
+
     // check if admin is trying to delete himself/herself
     if (loggedInUser.getUserId().equals(id)) {
       ra.addFlashAttribute("errormsg", "You are not authorised to delete yourself");

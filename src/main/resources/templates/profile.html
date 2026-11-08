@@ -17,12 +17,12 @@
   </div>
 
   <div class="form-container">
-    <!-- to resolve -->
     <form th:action="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/saveprofile} : @{/staff/saveprofile}" th:object="${profileForm}" method="POST">
       <!-- error summary banner -->
       <div class="error-global-msg" th:if="${#fields.hasAnyErrors()}">
+        <p th:if="${svcvalidationerror}" th:text="${svcvalidationerror}"></p>
         <p>Summary of Errors</p>
-        <ul><li th:each="error : ${#fields.allErrors()}" th:text=${error}></li></ul>
+        <ul><li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li></ul>
         <p> Unable to update your details. Please re-enter fields or review again before saving. </p>
       </div>
 
@@ -32,19 +32,19 @@
         <h3>User Personal Details</h3>
         <fieldset>
           <label>Name:</label>
-          <input type="text" th:field="*{name}" readonly>
+          <input type="text" th:field="*{name}">
           <span class="error-field-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
         </fieldset>
 
         <fieldset>
           <label>Username:</label>
-          <input type="text" th:field="*{username}" readonly>
+          <input type="text" th:field="*{username}">
           <span class="error-field-msg" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
         </fieldset>
 
         <fieldset>
           <label>Email:</label>
-          <input type="text" th:field="*{email}" readonly>
+          <input type="text" th:field="*{email}">
           <span class="error-field-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
         </fieldset>
 

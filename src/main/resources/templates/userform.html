@@ -19,14 +19,15 @@
   <div class="form-container">
     <form th:action="@{/admin/createuser}" th:object="${userForm}" method="POST">
       <!-- error summary banner -->
-       <div class="error-global-msg" th:if="${#fields.hasAnyErrors()}">
+      <div class="error-global-msg" th:if="${#fields.hasAnyErrors()}">
+        <p th:if="${svcvalidationerror}" th:text="${svcvalidationerror}"></p>
         <p>Summary of Errors</p>
-        <ul><li th:each="error : ${#fields.allErrors()}" th:text=${error}></li></ul>
-        <p> Unable to create new user. Please re-enter fields or review again before creating. </p>
-       </div>
-  
-       <input type="hidden" th:field="*{userId}">
-       <div class="form-fields-section">
+        <ul><li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li></ul>
+        <p> Unable to create new user / update user. Please re-enter fields or review again before creating / updating. </p>
+      </div>
+
+      <input type="hidden" th:field="*{userId}">
+      <div class="form-fields-section">
         <!-- user info -->
         <h3>User Personal Details</h3>
         <fieldset>
@@ -41,7 +42,7 @@
           <span class="error-field-msg" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
         </fieldset>
 
-         <fieldset>
+        <fieldset>
           <label>Email:</label>
           <input type="text" th:field="*{email}">
           <span class="error-field-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
@@ -53,10 +54,14 @@
             <option value="">--Select Role--</option>
             <option value="ROLE_ADMIN">Admin</option>
             <option value="ROLE_CEO">CEO</option>
+            <option value="ROLE_HR_DIRECTOR">HR Director</option>
+            <option value="ROLE_FINANCE_DIRECTOR">Finance Director</option>
+            <option value="ROLE_HR_MANAGER_R">HR Manager (Recruiter)</option>
+            <option value="ROLE_HR_MANAGER_I">HR Manager (Internal)</option>
             <option value="ROLE_HR_RECRUITER">HR Recruiter</option>
             <option value="ROLE_HR_INTERNAL">HR Internal</option>
-            <option value="ROLE_HR_MANAGER">HR Manager</option>
-            <option value="ROLE_EMPLOYEE">Employee</option>
+            <option value="ROLE_FINANCE_MANAGER">Finance Manager</option>
+            <option value="ROLE_FINANCE_EMPLOYEE">Finance Employee</option>
           </select>
           <span class="error-field-msg" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
         </fieldset>
@@ -70,11 +75,59 @@
           <span class="error-field-msg" th:if="${#fields.hasErrors('manager')}" th:errors="*{manager}"></span>
         </fieldset>
 
+        <fieldset>
+          <label>Date of Join:</label>
+          <input type="date" th:field="*{dateOfJoin}">
+           <span class="error-field-msg" th:if="${#fields.hasErrors('dateOfJoin')}" th:errors="*{dateOfJoin}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Marital Status:</label>
+          <select th:field="*{maritalStatus}">
+            <option value="">--Select Marital Status--</option>
+            <option value="MARRIED">Married</option>
+            <option value="SINGLE">Single</option>
+            <option value="DIVORCED">Divorced</option>           
+          </select>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('maritalStatus')}" th:errors="*{maritalStatus}"></span>
+        </fieldset>
+
+        <fieldset>
+          <label>Number of Children:</label>
+          <select th:field="*{childrenCount}">
+            <option value="">--Select Children Count--</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <span class="error-field-msg" th:if="${#fields.hasErrors('childrenCount')}" th:errors="*{childrenCount}"></span>
+        </fieldset>
+
+        <!-- entitlement info -->
+        <h3>User Entitlement Information</h3>
+        <fieldset>
+          <label>Annual Leave Entitlement:</label>
+          <input type="number" th:field="*{actualAnnualLeaveDays}" readonly>
+        </fieldset>
+
+        <fieldset>
+          <label>Hospitalization Leave Entitlement:</label>
+          <input type="number" th:field="*{actualHospitalizationLeaveDays}" readonly>
+        </fieldset>
+
+        <fieldset>
+          <label>Childcare Leave Entitlement:</label>
+          <input type="number" th:field="*{actualChildcareLeaveDays}" readonly>
+        </fieldset>
+
         <div class="form-buttons">
           <button type="submit">Save User</button>
           <button type="reset">Reset</button>
         </div>
-       </div>
+      </div>
     </form>
   </div>
 

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviewed Leave</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <!-- Flash Attributes -->
+  <div th:replace="~{fragments/body :: flash-attributes-section}"></div>
+
+  <h2>Reviewed Leave Archive</h2>
+
+  <!-- filter year section -->
+  <div th:replace="~{fragments/body :: filter-section-reviewedleave}"></div>
+
+  <h3>Locked Leave Archive</h3>
+  <!-- filter function for locked approved table -->
+  <div>
+    <form th:action="@{/staff/reviewedleave}" method="GET">
+      <input type="text" name="searchLocked" th:value="${filterLocked}" placeholder="Search by Username">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <p th:if="${#lists.isEmpty(subordinatesLockedApplications)}">You do not have any locked subordinates leave applications.</p>
+
+  <div class="leave-approval-container">
+    <table th:unless="${#lists.isEmpty(subordinatesLockedApplications)}" class="leave-approval-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Leave Type</th>
+          <th>Leave Duration</th>
+          <th>Leave Start Date</th>
+          <th>Leave End Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="l : ${subordinatesLockedApplications}">
+          <td th:text="${l.user.name}"></td>
+          <td th:text="${l.user.username}"></td>
+          <td th:text="${l.leaveType}"></td>
+          <td th:text="${l.leaveDuration}"></td>
+          <td th:text="${l.startDate}"></td>
+          <td th:text="${l.endDate}"></td>
+          <td th:text="${l.applicationStatus}"></td>
+          <td><a th:href="@{/staff/reviewleave(applicationId=${l.applicationId}, userId=${l.user.userId})}">Review</a></td>
+    </table>
+  </div>
+
+  <h3>Approved Leave Archive</h3>
+  <!-- filter function for approved table -->
+  <div>
+    <form th:action="@{/staff/reviewedleave}" method="GET">
+      <input type="text" name="searchApproved" th:value="${filterApproved}" placeholder="Search by Username">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <p th:if="${#lists.isEmpty(subordinatesApprovedApplications)}">You do not have any approved subordinates leave applications.</p>
+
+  <div class="leave-approval-container">
+    <table th:unless="${#lists.isEmpty(subordinatesApprovedApplications)}" class="leave-approval-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Leave Type</th>
+          <th>Leave Duration</th>
+          <th>Leave Start Date</th>
+          <th>Leave End Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="a : ${subordinatesApprovedApplications}">
+          <td th:text="${a.user.name}"></td>
+          <td th:text="${a.user.username}"></td>
+          <td th:text="${a.leaveType}"></td>
+          <td th:text="${a.leaveDuration}"></td>
+          <td th:text="${a.startDate}"></td>
+          <td th:text="${a.endDate}"></td>
+          <td th:text="${a.applicationStatus}"></td>
+          <td><a th:href="@{/staff/reviewleave(applicationId=${a.applicationId}, userId=${a.user.userId})}">Review</a></td>
+    </table>
+  </div>
+
+  <h3>Rejected Leave Archive</h3>
+  <!-- filter function for rejected table -->
+  <div>
+    <form th:action="@{/staff/reviewedleave}" method="GET">
+      <input type="text" name="searchRejected" th:value="${filterRejected}" placeholder="Search by Username">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <p th:if="${#lists.isEmpty(subordinatesRejectedApplications)}">You do not have any rejected subordinates leave applications.</p>
+
+  <div class="leave-approval-container">
+    <table th:unless="${#lists.isEmpty(subordinatesRejectedApplications)}" class="leave-approval-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Leave Type</th>
+          <th>Leave Duration</th>
+          <th>Leave Start Date</th>
+          <th>Leave End Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="r : ${subordinatesRejectedApplications}">
+          <td th:text="${r.user.name}"></td>
+          <td th:text="${r.user.username}"></td>
+          <td th:text="${r.leaveType}"></td>
+          <td th:text="${r.leaveDuration}"></td>
+          <td th:text="${r.startDate}"></td>
+          <td th:text="${r.endDate}"></td>
+          <td th:text="${r.applicationStatus}"></td>
+          <td><a th:href="@{/staff/reviewleave(applicationId=${r.applicationId}, userId=${r.user.userId})}">Review</a></td>
+    </table>
+  </div>
+
+  <h3>Cancelled Leave Archive</h3>
+  <!-- filter function for cancelled table -->
+  <div>
+    <form th:action="@{/staff/reviewedleave}" method="GET">
+      <input type="text" name="searchCancelled" th:value="${filterCancelled}" placeholder="Search by Username">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <p th:if="${#lists.isEmpty(subordinatesCancelledApplications)}">You do not have any cancelled subordinates leave applications.</p>
+
+  <div class="leave-approval-container">
+    <table th:unless="${#lists.isEmpty(subordinatesCancelledApplications)}" class="leave-approval-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Leave Type</th>
+          <th>Leave Duration</th>
+          <th>Leave Start Date</th>
+          <th>Leave End Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="c : ${subordinatesCancelledApplications}">
+          <td th:text="${c.user.name}"></td>
+          <td th:text="${c.user.username}"></td>
+          <td th:text="${c.leaveType}"></td>
+          <td th:text="${c.leaveDuration}"></td>
+          <td th:text="${c.startDate}"></td>
+          <td th:text="${c.endDate}"></td>
+          <td th:text="${c.applicationStatus}"></td>
+          <td><a th:href="@{/staff/reviewleave(applicationId=${c.applicationId}, userId=${c.user.userId})}">Review</a></td>
+    </table>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+
+</body>
+</html>
