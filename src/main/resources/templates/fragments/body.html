@@ -38,5 +38,10 @@
     </form>
   </div>
 
+  <!-- fragment for resume reviewer -->
+  <div th:fragment="access-to-demo-resume-reviewer">
+    <a sec:authorize="hasAnyRole('HR_DIRECTOR', 'HR_MANAGER_R', 'HR_RECRUITER')" th:href="@{/staff/reviewresume}">Access Demo Resume Reviewer</a>
+  </div>
+
 </body>
 </html>

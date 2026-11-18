@@ -1,5 +1,6 @@
 package com.example.integratedmanagementsystem.security;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
 import com.example.integratedmanagementsystem.model.Role;
@@ -18,6 +20,13 @@ import com.example.integratedmanagementsystem.model.Role;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
+
+  private final RateLimitFilter rateLimitFilter;
+
+  SecurityConfiguration(RateLimitFilter rateLimitFilter) {
+    this.rateLimitFilter = rateLimitFilter;
+  }
+
   @Bean
   @Order(1)
   public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
@@ -54,6 +63,7 @@ public class SecurityConfiguration {
         .logoutUrl("/admin/logout")
         .logoutSuccessUrl("/welcome?logout")
       )
+      .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
       .build();
   }
 
@@ -87,7 +97,15 @@ public class SecurityConfiguration {
         .logoutUrl("/logout")
         .logoutSuccessUrl("/?logout")
       )
+      .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
       .build();
+  }
+
+  @Bean
+  public FilterRegistrationBean<RateLimitFilter> disableSecondRunOfRateLimitFilter() {
+    FilterRegistrationBean<RateLimitFilter> registration = new FilterRegistrationBean<>(rateLimitFilter);
+    registration.setEnabled(false);
+    return registration;
   }
 
   @Bean

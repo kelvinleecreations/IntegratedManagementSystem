@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Resume</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+  <!-- header fragment -->
+  <div th:replace="~{fragments/header :: header-section}"></div>
+
+  <div id="flash-attribute-section-by-js" class="error-global-msg" style="display:none;"></div>
+
+  <div class="form-header">
+    <h3>Review Candidate(s) Resume</h3>
+  </div>
+
+  <div class="form-container">
+    <form id="resumeReviewForm" enctype="multipart/form-data" th:action="@{/api/resume/analysis}" method="POST">
+      <div class="form-fields-section">
+        <div class="job-description-section">
+          <h3>Job Description</h3>
+          <fieldset>
+            <label>JD:</label>
+            <textarea name="jobDescription" rows="5" placeholder="Please enter or paste your job description here for the AI reviewer"></textarea>
+          </fieldset>
+        </div>
+        
+        <div class="upload-resume-section">
+          <h3>Upload Candidate(s) Resume</h3>
+          <fieldset>
+            <label>Candidate(s) Resume</label>
+            <input type="file" name="files" accept=".pdf" multiple>
+          </fieldset>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" id="submit-button">Rank Candidates Based on Job Description</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="review-results-container" class="review-results-container">
+    <div class="error-msg-section"></div>
+    <div class="loading-msg-section"></div>
+    <div class="disclaimer-msg-section"></div>
+    <div class="review-candidate-section"></div>
+  </div>
+
+  <!-- footer fragment -->
+  <div th:replace="~{fragments/footer :: footer-section}"></div>
+
+  <script th:src="@{/javascript/resumeanalysis.js}"></script>
+</body>
+</html>

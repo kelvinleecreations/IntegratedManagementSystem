@@ -79,9 +79,9 @@ public class LeaveApplicationController {
     }
 
     // valid annotation check for first time or updating application, before review
-    if (form.getApplicationStatus() == ApplicationStatus.APPLIED || form.getApplicationStatus() == ApplicationStatus.UPDATED) {
+    if (form.getApplicationStatus() == ApplicationStatus.APPLIED || form.getApplicationStatus() == ApplicationStatus.UPDATED || form.getApplicationStatus() == null) {
       if (result.hasErrors()) {
-        return "reviewleave";
+        return "applyleave";
       }
     }
 

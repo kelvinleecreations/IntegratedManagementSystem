@@ -22,6 +22,9 @@
   <!-- Flash Attributes -->
   <div th:replace="~{fragments/body :: flash-attributes-section}"></div>
 
+  <!-- error banner for rate limiter -->
+  <div class="error-global-msg" th:if="${param.rateLimitExceeded}">Login Limit Reached: You have reached a maximum of 5 login attempts. Please try again later.</div>
+
   <div class="dual-login-container">
     <div>
       <form th:action="@{/staff/login}" method="GET">

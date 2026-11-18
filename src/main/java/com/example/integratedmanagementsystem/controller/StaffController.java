@@ -477,4 +477,19 @@ public class StaffController {
 
     }
   }
+
+  @GetMapping("/reviewresume")
+  public String reviewResume(@AuthenticationPrincipal SecurityUserDetails principalUser) {
+
+    // check whether user exists (for cases when user is still logged in and admin removes them from the system)
+    User loggedInUser = principalUser.getUser();
+
+    Optional<User> currentUser = userRepository.findById(loggedInUser.getUserId());
+    
+    if (currentUser.isEmpty()) {
+      return "redirect:/logout/accountnotfound";
+    }
+
+    return "reviewresume";
+  }
 }
